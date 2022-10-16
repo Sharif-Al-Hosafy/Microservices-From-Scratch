@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
 const { randomBytes } = require("crypto");
+const cors = require("cors");
 
 app.use(express.json());
+app.use(cors());
 const posts = {};
 
 app.get("/posts", (req, res) => {
@@ -16,6 +18,6 @@ app.post("/posts", (req, res) => {
   res.status(201).json(posts[id]);
 });
 
-app.listen(3000, () => {
+app.listen(4000, () => {
   console.log("server listining");
 });
