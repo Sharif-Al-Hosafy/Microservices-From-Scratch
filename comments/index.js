@@ -1,25 +1,41 @@
 const express = require("express");
-const app = express();
+const bodyParser = require("body-parser");
 const { randomBytes } = require("crypto");
 const cors = require("cors");
+const axios = require("axios");
 
-app.use(express.json());
+const app = express();
+app.use(bodyParser.json());
 app.use(cors());
+
 const commentsByPostId = {};
 
 app.get("/posts/:id/comments", (req, res) => {
-  res.status(200).json(commentsByPostId[req.params.id]);
+  res.send(commentsByPostId[req.params.id] || []);
 });
 
-app.post("/posts/:id/comments", (req, res) => {
+app.post("/posts/:id/comments", async (req, res) => {
   const commentId = randomBytes(4).toString("hex");
+  const { comment } = req.body;
+
   const comments = commentsByPostId[req.params.id] || [];
-  const { content } = req.body;
-  comments.push({ id: commentId, content });
+
+  comments.push({ id: commentId, comment });
+
   commentsByPostId[req.params.id] = comments;
-  res.status(201).json(commentsByPostId[req.params.id]);
+
+  await axios("http://localhost:4005", {
+    type: "commentCreated",
+    data: {
+      commentId,
+      comment,
+      postId: req.params.id,
+    },
+  });
+
+  res.status(201).send(comments);
 });
 
 app.listen(4001, () => {
-  console.log("server listining");
+  console.log("Listening on 4001");
 });
