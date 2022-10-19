@@ -19,8 +19,8 @@ app.post("/events", (req, res) => {
   }
 
   if (type === "commentCreated") {
-    const { id, comment, postId } = data;
-    posts[postId].comments.push({ id, comment });
+    const { id, comment, postId, status } = data;
+    posts[postId].comments.push({ id, comment, status });
   }
 
   res.status(201).send("ok");
